@@ -256,11 +256,11 @@ bool ofTrueTypeFont::loadFont(string _filename, int _fontSize, bool _bAntiAliase
 	dpi 				= _dpi;
 
 	//--------------- load the library and typeface
-	
+
     FT_Error err;
-    
+
     FT_Library library;
-    
+
     err = FT_Init_FreeType( &library );
     if (err){
 		ofLog(OF_LOG_ERROR,"ofTrueTypeFont::loadFont - Error initializing freetype lib: FT_Error = %d", err);
@@ -268,7 +268,7 @@ bool ofTrueTypeFont::loadFont(string _filename, int _fontSize, bool _bAntiAliase
 	}
 
 	FT_Face face;
-    
+
     err = FT_New_Face( library, filename.c_str(), 0, &face );
 	if (err) {
         // simple error table in lieu of full table (see fterrors.h)
@@ -307,7 +307,7 @@ bool ofTrueTypeFont::loadFont(string _filename, int _fontSize, bool _bAntiAliase
 		err = FT_Load_Glyph( face, FT_Get_Char_Index( face, (unsigned char)(i+NUM_CHARACTER_TO_START) ), FT_LOAD_DEFAULT );
         if(err){
 			ofLog(OF_LOG_ERROR,"ofTrueTypeFont::loadFont - Error with FT_Load_Glyph %i: FT_Error = %d", i, err);
-                        
+
 		}
 
 		if (bAntiAliased == true) FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
@@ -558,10 +558,10 @@ ofTTFCharacter ofTrueTypeFont::getCharacterAsPoints(int character){
 	}
     if (character - NUM_CHARACTER_TO_START >= nCharacters || character < NUM_CHARACTER_TO_START){
         ofLog(OF_LOG_ERROR,"Error : char (%i) not allocated -- line %d in %s", (character + NUM_CHARACTER_TO_START), __LINE__,__FILE__);
-        
+
         return ofTTFCharacter();
     }
-    
+
     return charOutlines[character - NUM_CHARACTER_TO_START];
 }
 
@@ -652,8 +652,18 @@ void ofTrueTypeFont::drawCharAsShape(int c, float x, float y) {
 	//-----------------------
 
 	ofTTFCharacter & charRef = charOutlines[c - NUM_CHARACTER_TO_START];
-	charRef.setFilled(ofGetStyle().bFill);
-	charRef.draw(x,y);
+
+//	charRef.setFilled(ofGetStyle().bFill);
+//	charRef.draw(x,y);
+
+    // KEITH
+    charRef.setFilled(true);
+    charRef.draw(x,y);
+
+    charRef.setFilled(false);
+    charRef.setStrokeWidth(1);
+    charRef.draw(x,y);
+
 }
 
 //-----------------------------------------------------------
@@ -698,8 +708,24 @@ ofRectangle ofTrueTypeFont::getStringBoundingBox(string c, float x, float y){
 				xoffset = 0 ; //reset X Pos back to zero
 	      } else if (c[index] == ' ') {
 	     		int cy = (int)'p' - NUM_CHARACTER_TO_START;
-				 xoffset += cps[cy].setWidth * letterSpacing * spaceSize;
+                xoffset += cps[cy].setWidth * letterSpacing * spaceSize;
 				 // zach - this is a bug to fix -- for now, we don't currently deal with ' ' in calculating string bounding box
+
+				 // keith
+				maxx	= (x + xoffset);// + cps[cy].leftExtent + cps[cy].width*spaceSize + 0);
+
+				if (bFirstCharacter == true){
+                    GLint height	= cps[cy].height;
+                    GLint top		= cps[cy].topExtent - cps[cy].height;
+
+                    float corr = (float)(((fontSize - height) + top) - fontSize);
+
+                    minx = x;
+                    miny = (y + yoffset + -top + corr);
+                    maxy = (y + yoffset + height + corr);
+                    bFirstCharacter = false;
+				}
+
 		  } else if(cy > -1){
                 GLint height	= cps[cy].height;
             	GLint bwidth	= cps[cy].width * letterSpacing;
@@ -875,11 +901,14 @@ void ofTrueTypeFont::drawStringAsShapes(string c, float x, float y) {
 
 		  }else if (c[index] == ' ') {
 				 int cy = (int)'p' - NUM_CHARACTER_TO_START;
-				 X += cps[cy].setWidth;
+				 //X += cps[cy].setWidth;
+				 X += cps[cy].setWidth * letterSpacing * spaceSize;
 				 //glTranslated(cps[cy].width, 0, 0);
 		  } else if(cy > -1){
 				drawCharAsShape(c[index], X, Y);
-				X += cps[cy].setWidth;
+				//X += cps[cy].setWidth;
+				X += cps[cy].setWidth * letterSpacing;
+
 				//glTranslated(cps[cy].setWidth, 0, 0);
 		  }
 		}
