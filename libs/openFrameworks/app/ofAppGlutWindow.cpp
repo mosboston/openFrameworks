@@ -28,7 +28,7 @@ static int			nFramesForFPS;
 static int			nFrameCount;
 static int			buttonInUse;
 static bool			bEnableSetupScreen;
-static bool			bDoubleBuffered; 
+static bool			bDoubleBuffered;
 
 
 static bool			bFrameRateSet;
@@ -223,7 +223,7 @@ ofAppGlutWindow::ofAppGlutWindow(){
  }
 
 
-void ofAppGlutWindow::setDoubleBuffering(bool _bDoubleBuffered){ 
+void ofAppGlutWindow::setDoubleBuffering(bool _bDoubleBuffered){
 	bDoubleBuffered = _bDoubleBuffered;
 }
 
@@ -240,10 +240,10 @@ void ofAppGlutWindow::setupOpenGL(int w, int h, int screenMode){
 	if( displayString != ""){
 		glutInitDisplayString( displayString.c_str() );
 	}else{
-		if(bDoubleBuffered){  
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA );
+		if(bDoubleBuffered){
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA | GLUT_STENCIL);
 		}else{
-			glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH | GLUT_ALPHA );
+			glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH | GLUT_ALPHA | GLUT_STENCIL);
 		}
 	}
 
@@ -270,7 +270,7 @@ void ofAppGlutWindow::setupOpenGL(int w, int h, int screenMode){
 		if( displayString != ""){
 			glutInitDisplayString( displayString.c_str() );
 		}else{
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA );
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA | GLUT_STENCIL);
 		}
 
     	// w x h, 32bit pixel depth, 60Hz refresh rate
@@ -520,8 +520,8 @@ void ofAppGlutWindow::display(void){
 				#ifdef TARGET_OSX
 					SetSystemUIMode(kUIModeAllHidden,NULL);
 					#ifdef MAC_OS_X_VERSION_10_7 //needed for Lion as when the machine reboots the app is not at front level
-						if( nFrameCount <= 10 ){  //is this long enough? too long? 
-							ProcessSerialNumber psn;							
+						if( nFrameCount <= 10 ){  //is this long enough? too long?
+							ProcessSerialNumber psn;
 							OSErr err = GetCurrentProcess( &psn );
 							if ( err == noErr ){
 								SetFrontProcess( &psn );
@@ -771,7 +771,7 @@ void ofAppGlutWindow::resize_cb(int w, int h) {
 }
 
 void ofAppGlutWindow::entry_cb( int state ) {
-	
+
 	ofNotifyWindowEntry( state );
-	
+
 }
