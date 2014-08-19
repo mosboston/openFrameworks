@@ -553,7 +553,7 @@ void ofGstUtils::gstHandleMessage(){
 			case GST_MESSAGE_EOS:
 				ofLog(OF_LOG_VERBOSE,"GStreamer: end of the stream.");
 				bIsMovieDone = true;
-				
+
 				if(appsink && !isAppSink) appsink->on_eos();
 
 				switch(loopMode){
@@ -787,6 +787,10 @@ float ofGstVideoUtils::getWidth(){
 
 bool ofGstVideoUtils::setPipeline(string pipeline, int bpp, bool isStream, int w, int h){
 	string caps;
+
+    cout << "---------------->>>>  bpp in setPipeline is: " << bpp << endl;
+
+
 #if GST_VERSION_MAJOR==0
 	if(bpp==8)
 		caps="video/x-raw-gray, depth=8, bpp=8";
@@ -818,6 +822,7 @@ bool ofGstVideoUtils::setPipeline(string pipeline, int bpp, bool isStream, int w
 }
 
 bool ofGstVideoUtils::allocate(int w, int h, int _bpp){
+    cout << "bpp in pixel allocate is: " << _bpp << endl;
 	pixels.allocate(w,h,_bpp/8);
 	backPixels.allocate(w,h,_bpp/8);
 	prevBuffer = 0;
@@ -830,8 +835,9 @@ bool ofGstVideoUtils::allocate(int w, int h, int _bpp){
 #if GST_VERSION_MAJOR==0
 GstFlowReturn ofGstVideoUtils::preroll_cb(GstBuffer * _buffer){
 	guint size = GST_BUFFER_SIZE (_buffer);
+	// KEITH MADE THIS > instead of !=
 	if(pixels.isAllocated() && pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()!=(int)size){
-		ofLog(OF_LOG_ERROR, "on_preproll: error preroll buffer size: " + ofToString(size) + "!= init size: " + ofToString(pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()));
+		ofLog(OF_LOG_ERROR, "MAJOR 0: on_preproll: error preroll buffer size: " + ofToString(size) + "!= init size: " + ofToString(pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()));
 		gst_buffer_unref (_buffer);
 		return GST_FLOW_ERROR;
 	}
@@ -892,8 +898,10 @@ GstFlowReturn ofGstVideoUtils::buffer_cb(GstBuffer * _buffer){
 	guint size;
 
 	size = GST_BUFFER_SIZE (_buffer);
+    // KEITH MADE THIS > instead of !=
+
 	if(pixels.isAllocated() && pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()!=(int)size){
-		ofLog(OF_LOG_ERROR, "on_preproll: error on new buffer, buffer size: " + ofToString(size) + "!= init size: " + ofToString(pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()));
+		ofLog(OF_LOG_ERROR, "MAJOR 0: on_preproll: error on new buffer, buffer size: " + ofToString(size) + "!= init size: " + ofToString(pixels.getWidth()*pixels.getHeight()*pixels.getBytesPerPixel()));
 		gst_buffer_unref (_buffer);
 		return GST_FLOW_ERROR;
 	}

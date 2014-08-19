@@ -38,7 +38,10 @@ bool ofGstVideoPlayer::loadMovie(string name){
 	if( name.find( "file://",0 ) != string::npos){
 		bIsStream		= false;
 	}else if( name.find( "://",0 ) == string::npos){
-		name 			= "file://"+ofToDataPath(name,true);
+		if (ofIsStringInString(name,"M:\\"))
+            name 			= "file:///"+name; //KEITH ofToDataPath(name,true);
+        else
+            name 			= "file:///"+ofToDataPath(name,true);
 		bIsStream		= false;
 	}else{
 		bIsStream		= true;
@@ -72,7 +75,8 @@ bool ofGstVideoPlayer::loadMovie(string name){
 		break;
 	case OF_PIXELS_RGB:
 		mime = "video/x-raw-rgb";
-		bpp = 24;
+		//mime = "video/x-raw-yuv";
+		bpp = 24; // should be 24 THIS AFFECTS BOTH STYLE VIDS
 		break;
 	case OF_PIXELS_RGBA:
 	case OF_PIXELS_BGRA:
@@ -81,18 +85,21 @@ bool ofGstVideoPlayer::loadMovie(string name){
 		break;
 	default:
 		mime = "video/x-raw-rgb";
-		bpp=24;
+		bpp=24; // should be 24
 		break;
 	}
 
+
 	GstCaps *caps = gst_caps_new_simple(mime.c_str(),
 										"bpp", G_TYPE_INT, bpp,
-										"depth", G_TYPE_INT, 24,
+										"depth", G_TYPE_INT, 24, // should be 24
 										"endianness",G_TYPE_INT,4321,
 										"red_mask",G_TYPE_INT,0xff0000,
 										"green_mask",G_TYPE_INT,0x00ff00,
 										"blue_mask",G_TYPE_INT,0x0000ff,
 										"alpha_mask",G_TYPE_INT,0x000000ff,
+										//"pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1, // keith
+                                        //"format", G_TYPE_STRING, "YUY2",  // keith
 										NULL);
 #else
 	int bpp;
