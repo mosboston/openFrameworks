@@ -524,7 +524,7 @@ void ofGstUtils::gstHandleMessage(){
 					bLoaded = true;
 					bPlaying = true;
 					if(!bPaused){
-						cout << "setting stream pipeline to play " << endl;
+						ofLogVerbose() << "setting stream pipeline to play " << endl;
 						play();
 					}
 				}
@@ -788,7 +788,7 @@ float ofGstVideoUtils::getWidth(){
 bool ofGstVideoUtils::setPipeline(string pipeline, int bpp, bool isStream, int w, int h){
 	string caps;
 
-    cout << "---------------->>>>  bpp in setPipeline is: " << bpp << endl;
+    ofLogVerbose() << "---------------->>>>  bpp in setPipeline is: " << bpp << endl;
 
 
 #if GST_VERSION_MAJOR==0
@@ -822,7 +822,7 @@ bool ofGstVideoUtils::setPipeline(string pipeline, int bpp, bool isStream, int w
 }
 
 bool ofGstVideoUtils::allocate(int w, int h, int _bpp){
-    cout << "bpp in pixel allocate is: " << _bpp << endl;
+    ofLogVerbose() << "bpp in pixel allocate is: " << _bpp << endl;
 	pixels.allocate(w,h,_bpp/8);
 	backPixels.allocate(w,h,_bpp/8);
 	prevBuffer = 0;
